@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Gastos.App.Views.DespesasPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Gastos.App.ViewModels"
+    x:DataType="vm:DespesasViewModel"
+    Title="Meus gastos">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Sair" Command="{Binding SairCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Resumo do período -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16" Spacing="2">
+            <Label
+                Text="{Binding Periodo}"
+                FontSize="14"
+                Opacity="0.7" />
+            <Label
+                Text="{Binding Total, StringFormat='{0:C}'}"
+                FontSize="32"
+                FontAttributes="Bold" />
+        </VerticalStackLayout>
+
+        <!-- Lista -->
+        <CollectionView
+            Grid.Row="1"
+            ItemsSource="{Binding Linhas}"
+            SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="28" Spacing="8" VerticalOptions="Center">
+                    <Label
+                        Text="Nenhuma despesa neste mês"
+                        FontSize="17"
+                        FontAttributes="Bold"
+                        HorizontalTextAlignment="Center" />
+                    <Label
+                        Text="Toque em Nova despesa para registrar o primeiro gasto."
+                        FontSize="14"
+                        Opacity="0.7"
+                        HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:LinhaDespesa">
+                    <Grid Padding="20,12" ColumnDefinitions="40,*,Auto" ColumnSpacing="12">
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DespesasViewModel}}, Path=EditarCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+
+                        <Label
+                            Grid.Column="0"
+                            Text="{Binding DataFormatada}"
+                            FontSize="13"
+                            Opacity="0.7"
+                            VerticalOptions="Center" />
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="{Binding Estabelecimento}" FontSize="16" />
+                            <Label Text="{Binding Categoria}" FontSize="13" Opacity="0.7" />
+                        </VerticalStackLayout>
+
+                        <Label
+                            Grid.Column="2"
+                            Text="{Binding ValorFormatado}"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button
+            Grid.Row="2"
+            Margin="20,8,20,20"
+            Text="Nova despesa"
+            Command="{Binding NovaCommand}" />
+
+    </Grid>
+</ContentPage>

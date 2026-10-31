@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Gastos.App.Views.DespesaFormPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dominio="clr-namespace:Gastos.Shared.Dominio;assembly=Gastos.Shared"
+    xmlns:vm="clr-namespace:Gastos.App.ViewModels"
+    x:DataType="vm:DespesaFormViewModel"
+    Title="{Binding Titulo}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="16">
+
+            <Label Text="Valor" FontSize="14" Opacity="0.7" />
+            <Entry
+                Placeholder="0,00"
+                Keyboard="Numeric"
+                Text="{Binding ValorTexto}" />
+
+            <Label Text="Estabelecimento" FontSize="14" Opacity="0.7" />
+            <Entry
+                Placeholder="Onde foi o gasto"
+                Text="{Binding Estabelecimento}" />
+
+            <Label Text="Data" FontSize="14" Opacity="0.7" />
+            <DatePicker Date="{Binding Data}" Format="dd/MM/yyyy" />
+
+            <Label Text="Categoria" FontSize="14" Opacity="0.7" />
+            <Picker
+                ItemsSource="{Binding Categorias}"
+                ItemDisplayBinding="{Binding Nome, x:DataType=dominio:Categoria}"
+                SelectedItem="{Binding Categoria}"
+                Title="Escolha uma categoria" />
+
+            <Label
+                Text="{Binding Aviso}"
+                IsVisible="{Binding TemAviso}"
+                TextColor="#B3261E"
+                FontSize="14" />
+
+            <Button Text="Salvar" Command="{Binding SalvarCommand}" Margin="0,8,0,0" />
+
+            <Button
+                Text="Excluir"
+                Command="{Binding ExcluirCommand}"
+                IsVisible="{Binding PodeExcluir}"
+                BackgroundColor="Transparent"
+                TextColor="#B3261E" />
+
+            <Button
+                Text="Cancelar"
+                Command="{Binding CancelarCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Gray" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

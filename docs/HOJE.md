@@ -1,109 +1,104 @@
-# Plano dos 4 dias — entrega do código em 03/11
+# Plano até a entrega do código — 03/11
+
+Atualizado em sábado, 31/10, depois da primeira execução no emulador.
 
 Meta mínima da entrega: **autenticação, cadastro manual de despesas e lista do
 mês, rodando no emulador Android, com os dados gravados no SQLite do aparelho.**
-Isso cobre RF01 e a autenticação, e é um 20% do escopo defensável na banca.
 
 ---
 
-## Antes de tudo: comece o download agora
+## Sábado 31 — concluído ✅
 
-No Visual Studio Installer, marque **Desenvolvimento para dispositivos móveis
-com .NET** e mande instalar. São vários gigabytes entre carga de trabalho, SDK
-do Android e imagem do emulador, e numa conexão doméstica isso leva de uma a
-três horas. **Inicie o download antes de ler o resto deste arquivo** e faça as
-outras tarefas enquanto ele roda.
+- [x] Repositório clonado do GitHub e trabalho na branch `feature/estrutura-app`
+- [x] Telas integradas: Login, Meus gastos e Nova despesa
+- [x] Criadas as classes que faltavam no pacote: `ContextoLocal` (banco SQLite)
+      e `ServicoAutenticacao` (login na API)
+- [x] Pacotes adicionados: `CommunityToolkit.Mvvm` e
+      `Microsoft.EntityFrameworkCore.Sqlite`
+- [x] Plataformas reduzidas a Android e Windows
+- [x] Datas e valores em português do Brasil
+- [x] Emulador Pixel 7 criado no disco D: (variável `ANDROID_AVD_HOME`)
+- [x] **Teste completo funcionou:** entrar sem servidor → cadastrar despesa →
+      ver na lista com o total → fechar e reabrir → a despesa continua lá
 
-Enquanto baixa, já dá para:
+**Falta fechar hoje:**
 
-- subir o repositório no GitHub, se ainda não estiver lá;
-- criar o banco no MySQL Workbench:
-  `CREATE DATABASE gastos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
-- cadastrar as tarefas abaixo como *issues* no quadro do projeto.
+- [ ] Rodar de novo e conferir "outubro de 2026" e "R$ 150,00"
+- [ ] Commit, push e pull request da `feature/estrutura-app` para a `develop`:
 
----
+  ```
+  git -c color.ui=false status -s
+  git add .
+  git commit -m "feat: telas de login, lista e cadastro de despesas com banco local"
+  git push -u origin feature/estrutura-app
+  ```
 
-## Hoje, sábado 31
-
-O objetivo do dia é um só: **o aplicativo abrir no emulador e salvar uma
-despesa.** Se isso funcionar hoje, a entrega está garantida e os outros três
-dias viram folga.
-
-1. **Criar o projeto MAUI.** Arquivo → Novo → Projeto → Aplicativo .NET MAUI,
-   nome `Gastos.App`, dentro de `src/`. Nas propriedades, deixe só o Android
-   como destino.
-
-2. **Adicionar as referências.** No `Gastos.App.csproj`:
-
-   ```xml
-   <ItemGroup>
-     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-   </ItemGroup>
-   <ItemGroup>
-     <ProjectReference Include="..\Gastos.Shared\Gastos.Shared.csproj" />
-   </ItemGroup>
-   ```
-
-3. **Copiar os arquivos deste pacote** para dentro de `src/Gastos.App/`,
-   mantendo as pastas `Views`, `ViewModels`, `Servicos` e `Dados`. Os arquivos
-   `MauiProgram.cs`, `App.xaml.cs`, `AppShell.xaml` e `AppShell.xaml.cs`
-   substituem os que o Visual Studio gerou.
-
-4. **Criar o banco na primeira execução.** Em `App.xaml.cs`, dentro do
-   construtor, antes de `MainPage`:
-
-   ```csharp
-   using (var db = new Gastos.App.Dados.ContextoLocal())
-       db.Database.EnsureCreated();
-   ```
-
-5. **Rodar no emulador e corrigir o que aparecer.** Esta é a parte que consome
-   tempo: na primeira compilação de um projeto MAUI quase sempre falta um
-   pacote ou sobra um arquivo do modelo. Reserve a tarde para isso.
-
-6. **Testar o caminho completo:** abrir, tocar em *Entrar sem servidor*,
-   cadastrar uma despesa, ver a despesa na lista e o total somado no topo.
-   Feche e reabra o aplicativo: a despesa tem que continuar lá.
-
-> O botão **Entrar sem servidor** só existe em compilação de desenvolvimento.
-> Ele permite trabalhar nas telas hoje, sem depender da API estar pronta.
+  No GitHub: **Compare & pull request**, com *base* = `develop`. Pedir revisão
+  ao Arthur.
 
 ---
 
-## Domingo 1
+## Domingo 1 — API e login de verdade
 
-Autenticação de ponta a ponta, que é a parte que pode dar errado e por isso fica
+Autenticação de ponta a ponta. É a parte que pode dar errado, por isso fica
 isolada num dia só.
 
-1. Configurar os segredos da API, cada um na própria máquina:
+1. **Criar o banco** no MySQL Workbench:
 
-   ```bash
-   cd src/Gastos.Api
-   dotnet user-secrets init
+   ```sql
+   CREATE DATABASE gastos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+2. **Configurar os segredos da API**, cada um na própria máquina. No `cmd`:
+
+   ```
+   cd C:\Projetos\app-analise-gastos\src\Gastos.Api
    dotnet user-secrets set "ConnectionStrings:MySql" "server=localhost;database=gastos;user=root;password=SUA_SENHA"
    dotnet user-secrets set "Jwt:Chave" "uma-frase-longa-e-aleatoria-com-pelo-menos-32-caracteres"
    ```
 
-2. `dotnet run` e testar cadastro e login pelo Swagger, em `/swagger`.
-3. No emulador, cadastrar uma conta de verdade pelo aplicativo.
-4. Conferir no Workbench que o usuário apareceu na tabela e que a coluna de
-   senha guarda um resumo criptográfico, não a senha.
+   O projeto já tem `UserSecretsId`, então não precisa do `user-secrets init`.
+   As senhas ficam fora do repositório.
+
+3. **Subir a API**, no mesmo `cmd`:
+
+   ```
+   dotnet run
+   ```
+
+   Ela já está configurada para a porta 5000. Se o Windows perguntar sobre o
+   firewall, permita. Deixe esse `cmd` aberto enquanto testa.
+
+4. **Testar pelo Swagger** em `http://localhost:5000/swagger`: `POST /auth/cadastro`
+   e depois `POST /auth/login` com o mesmo e-mail e senha (mínimo 8 caracteres).
+
+5. **Testar pelo aplicativo:** rodar o app no emulador pelo Visual Studio, com a
+   API ainda aberta no `cmd`, e usar **Criar conta**. O app deve abrir direto
+   na lista de despesas.
+
+6. **Conferir no Workbench** que a senha não foi gravada:
+
+   ```sql
+   SELECT Email, SenhaHash FROM gastos.Usuarios;
+   ```
+
+   A coluna `SenhaHash` deve mostrar um texto começando com `$2`, nunca a senha.
 
 Se a API não subir hoje, **pare e entregue sem ela**. O aplicativo funciona
-inteiro com o banco local, e isso é exatamente o que a arquitetura escolhida
+inteiro com o banco local, e é exatamente isso que a arquitetura escolhida
 permite. Dizer isso no relatório é melhor do que atrasar a entrega.
 
 ---
 
-## Segunda 2
+## Segunda 2 — acabamento e release
 
-Acabamento e empacotamento da entrega.
-
-1. Rodar o aplicativo e tirar prints de cada tela.
-2. Atualizar o `README.md` com os prints e o que a versão faz.
-3. Fechar as *issues* concluídas no quadro.
-4. Criar a *release* `v0.1.0` no GitHub, apontando para a `main`.
+1. Testar também **editar** e **excluir** uma despesa (tocar na despesa da
+   lista abre o formulário de edição).
+2. Rodar o aplicativo e tirar prints de cada tela.
+3. Atualizar o `README.md` com os prints e o que a versão faz.
+4. Fechar as *issues* concluídas no quadro do projeto.
+5. Pull request da `develop` para a `main`.
+6. Criar a *release* `v0.1.0` no GitHub, apontando para a `main`.
 
 ---
 
@@ -120,4 +115,15 @@ Só enviar. Deixe o dia livre para imprevisto.
 3. O cadastro de conta pelo aplicativo, usando o Swagger para criar o usuário.
 
 **Não corte:** o aplicativo abrir no emulador e gravar uma despesa que
-sobrevive ao fechamento. Sem isso não existe código funcional para entregar.
+sobrevive ao fechamento. **Isso já está funcionando.**
+
+---
+
+## Pendências para depois da entrega
+
+- Atualizar `SQLitePCLRaw` para a 3.0 (vulnerabilidade CVE-2025-6965 no SQLite)
+  e o `MySqlConnector` da API.
+- Restringir o tráfego HTTP sem criptografia no Android, liberado só para os
+  testes locais.
+- No modo "Entrar sem servidor", lembrar a sessão ao reabrir o app (hoje é
+  preciso tocar no botão de novo).

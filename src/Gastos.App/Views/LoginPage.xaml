@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Gastos.App.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Gastos.App.ViewModels"
+    x:DataType="vm:LoginViewModel"
+    Title="Entrar"
+    Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="28,56" Spacing="18">
+
+            <Label
+                Text="Análise de Gastos"
+                FontSize="30"
+                FontAttributes="Bold" />
+
+            <Label
+                Text="Entre para começar a registrar seus gastos."
+                FontSize="15"
+                Opacity="0.7"
+                Margin="0,-8,0,8" />
+
+            <Entry
+                Placeholder="E-mail"
+                Keyboard="Email"
+                Text="{Binding Email}" />
+
+            <Entry
+                Placeholder="Senha (mínimo 8 caracteres)"
+                IsPassword="True"
+                Text="{Binding Senha}" />
+
+            <Label
+                Text="{Binding Aviso}"
+                IsVisible="{Binding TemAviso}"
+                TextColor="#B3261E"
+                FontSize="14" />
+
+            <ActivityIndicator
+                IsRunning="{Binding Ocupado}"
+                IsVisible="{Binding Ocupado}"
+                HeightRequest="28" />
+
+            <Button
+                Text="Entrar"
+                Command="{Binding EntrarCommand}"
+                IsEnabled="{Binding NaoOcupado}" />
+
+            <Button
+                Text="Criar conta"
+                Command="{Binding CadastrarCommand}"
+                IsEnabled="{Binding NaoOcupado}"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#1B6B64, Dark=#5FC8BE}" />
+
+            <!-- Visível apenas em compilação de desenvolvimento. Permite
+                 trabalhar nas telas antes de a API estar no ar. -->
+            <Button
+                x:Name="BotaoModoLocal"
+                Text="Entrar sem servidor (desenvolvimento)"
+                IsVisible="False"
+                FontSize="13"
+                BackgroundColor="Transparent"
+                TextColor="Gray" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

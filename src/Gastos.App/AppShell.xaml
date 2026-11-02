@@ -3,12 +3,18 @@
     x:Class="Gastos.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Gastos.App"
-    Title="Gastos.App">
+    xmlns:views="clr-namespace:Gastos.App.Views"
+    Shell.FlyoutBehavior="Disabled">
+
+    <!-- As duas telas de topo. A navegação entre elas usa rota absoluta
+         (//login, //despesas), que troca a tela e limpa o histórico: depois de
+         entrar, o botão Voltar não deve devolver o usuário ao login. -->
+    <ShellContent
+        Route="login"
+        ContentTemplate="{DataTemplate views:LoginPage}" />
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="despesas"
+        ContentTemplate="{DataTemplate views:DespesasPage}" />
 
 </Shell>
